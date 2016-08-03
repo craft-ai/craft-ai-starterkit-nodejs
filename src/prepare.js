@@ -14,14 +14,15 @@ import unzip from 'unzip';
 dotenv.load();
 
 const ROOT_DIR = path.join(__dirname, '../');
-const URL = DATASETS[DATASET];
+const DATASET_URL = DATASETS[DATASET].url;
+const DATASET_FILE = DATASETS[DATASET].file;
 
 // 0 - Cleanup the mess
 new Promise((resolve, reject) => rimraf(path.join(ROOT_DIR, DATA_DIR, DATASET), err => err ? reject(err) : resolve(err)))
 // 1 - Download the dataset
 .then(() => new Promise((resolve, reject) => {
-  http.get(URL, function(response) {
-    console.log(`Retrieving dataset '${DATASET}' from '${URL}'...`);
+  http.get(DATASET_URL, function(response) {
+    console.log(`Retrieving dataset '${DATASET}' from '${DATASET_URL}'...`);
     response
     .pipe(unzip.Extract({
       path: path.join(ROOT_DIR, DATA_DIR)
@@ -33,7 +34,7 @@ new Promise((resolve, reject) => rimraf(path.join(ROOT_DIR, DATA_DIR, DATASET), 
 // 2 - Parse the data to retrieve the sensors and their values
 .then(() => new Promise((resolve, reject) => {
   console.log(`Extracting the metadata from dataset '${DATASET}'...`);
-  createDatasetReadStream(path.join(ROOT_DIR, DATA_DIR, DATASET, 'rawdata.txt'))
+  createDatasetReadStream(path.join(ROOT_DIR, DATA_DIR, DATASET, DATASET_FILE))
   .pipe(streamReduce(({ from, to, count, sensors }, { datetime, sensor, value }) => {
     if (!from || datetime.isBefore(from)) {
       from = datetime;
@@ -41,13 +42,35 @@ new Promise((resolve, reject) => rimraf(path.join(ROOT_DIR, DATA_DIR, DATASET), 
     if (!to || datetime.isAfter(to)) {
       to = datetime;
     }
-    sensors[sensor] = sensors[sensor] || {
-      name: sensor,
-      count: 0,
-      values: []
-    };
-    sensors[sensor].count += 1;
-    sensors[sensor].values = _(sensors[sensor].values).union([value]).sort().value();
+    if (_.isUndefined(sensors[sensor])) {
+      if (_.isNumber(value)) {
+        sensors[sensor] = {
+          name: sensor,
+          count: 1,
+          min: value,
+          max: value,
+          initialValue: value
+        };
+      }
+      else {
+        sensors[sensor] = {
+          name: sensor,
+          count: 1,
+          values: [value],
+          initialValue: value
+        };
+      }
+    }
+    else {
+      sensors[sensor].count += 1;
+      if (_.isNumber(value)) {
+        sensors[sensor].min = Math.min(value, sensors[sensor].min);
+        sensors[sensor].max = Math.max(value, sensors[sensor].max);
+      }
+      else {
+        sensors[sensor].values = _.union(sensors[sensor].values, [value]);
+      }
+    }
     count += 1;
     return { from, to, count, sensors };
   }, {

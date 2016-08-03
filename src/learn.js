@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { CRAFT_AGENT, DATASET, DATA_DIR, SENSORS_CONTEXT, SENSORS_OUTPUT, SENSORS_POSTTREAMENT, TIME_QUANTUM, LOWER_BOUND, UPPER_BOUND } from './cfg';
+import { CRAFT_AGENT, DATASET, DATASETS, DATA_DIR, SENSORS_CONTEXT, SENSORS_OUTPUT, SENSORS_POSTTREAMENT, TIME_QUANTUM, LOWER_BOUND, UPPER_BOUND } from './cfg';
 import craftai, { Time } from 'craft-ai';
 import createDatasetReadStream from './createDatasetReadStream';
 import dotenv from 'dotenv';
@@ -14,6 +14,7 @@ dotenv.load();
 const ROOT_DIR = path.join(__dirname, '../');
 const DATASET_DIR = path.join(ROOT_DIR, DATA_DIR, DATASET);
 const DATASET_METADATA = require(path.join(DATASET_DIR, 'metadata.json'));
+const DATASET_FILE = path.join(DATASET_DIR,  DATASETS[DATASET].file);
 const ACTUAL_FROM = LOWER_BOUND.isAfter(DATASET_METADATA.from) ? LOWER_BOUND : moment(DATASET_METADATA.from);
 const ACTUAL_TO = UPPER_BOUND.isBefore(DATASET_METADATA.to) ? UPPER_BOUND : moment(DATASET_METADATA.to);
 
@@ -26,7 +27,7 @@ let CRAFT_CLIENT = craftai({
 
 const CRAFT_MODEL = {
   context: _.reduce(SENSORS_CONTEXT, (context, sensor) => {
-    const initialValue = SENSORS_POSTTREAMENT(sensor, DATASET_METADATA.sensors[sensor].values[0]);
+    const initialValue = SENSORS_POSTTREAMENT(sensor, DATASET_METADATA.sensors[sensor].initialValue);
     context[sensor] = {
       type: (SENSORS_OUTPUT === sensor || _.isString(initialValue)) ? 'enum' : 'continuous'
     };
@@ -60,7 +61,7 @@ CRAFT_CLIENT.destroyAgent(CRAFT_AGENT)
     tz: t.timezone
   };
   _.each(SENSORS_CONTEXT, sensor => {
-    const initialValue = DATASET_METADATA.sensors[sensor].values[0];
+    const initialValue = DATASET_METADATA.sensors[sensor].initialValue;
     diff[sensor] = CRAFT_MODEL.context[sensor].type === 'enum' ? `${SENSORS_POSTTREAMENT(sensor, initialValue)}` : SENSORS_POSTTREAMENT(sensor, initialValue);
   });
   const operation = {
@@ -72,11 +73,9 @@ CRAFT_CLIENT.destroyAgent(CRAFT_AGENT)
 })
 // 3 - Send the dataset's operations
 .then(() => new Promise((resolve, reject) => {
-  const f = path.join(DATASET_DIR, 'rawdata.txt');
-
-  console.log(`Adding context operations to agent ${CRAFT_AGENT} from '${f}'.`);
+  console.log(`Adding context operations to agent ${CRAFT_AGENT} from '${DATASET_FILE}'.`);
   // Create a read stream of the dataset
-  createDatasetReadStream(f)
+  createDatasetReadStream(DATASET_FILE)
   // Filter it out
   .pipe(es.map(({ datetime, sensor, value }, cb) => {
     if (CRAFT_MODEL.context[sensor] &&

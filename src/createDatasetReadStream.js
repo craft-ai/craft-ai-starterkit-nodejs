@@ -8,7 +8,7 @@ export default function createDatasetReadStream(path) {
   .pipe(es.split()) //split stream to break on newlines
   .pipe(es.map((line, cb) => {
     try {
-      const [date, time, sensor, value] = line.split(' ');
+      const [date, time, sensor, value] = line.split(/[\s]+/);
       if (_.isString(date) && _.isString(time) && _.isString(sensor) && _.isString(value)) {
         const numberValue = _.toNumber(value);
 
