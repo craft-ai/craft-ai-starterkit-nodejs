@@ -15,8 +15,9 @@
   },
   "scripts": {
     "build": "babel src --out-dir bin",
-    "learn": "npm run build && node bin/learn.js",
-    "prepare": "npm run build && node bin/prepare.js",
+    "start": "npm run build && node bin/learn.js",
+    "build-data": "babel src --out-dir data",
+    "prepare_data": "npm run build-data && node bin/prepare_data.js",
     "lint": "eslint .",
     "fix_lint": "eslint --fix ."
   },
