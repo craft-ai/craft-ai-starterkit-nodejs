@@ -22,7 +22,7 @@ Automate the light in a room based on movement, date and time.
 
 In order to reach our goal, we use real data from a house with 2 residents, gathered around 1 year (2009 - 2010) academic year.
 This house is equipped with sensors like motion, light, temperature, door, etc, in all the rooms.
-All the data came from the dataset twor2010 that can be found [here](http://ailab.wsu.edu/casas/datasets/).
+All the data came from the dataset *twor.2010* that can be found [here](http://ailab.wsu.edu/casas/datasets/).
 
 In this particular example, we will show you how to use craft ai to do this automation.
 
@@ -39,7 +39,7 @@ But if you want to pre-treat by yourself, you could run:
 > npm run prepare_data.
 ```
 
-The result will be set in data/twor.2010.
+The result will be set in `data/twor.2010`. If you want to see exactly what is done, you can see `src/prepare.js`.
 
 ### Create an agent, send data and get a decision tree ###
 
