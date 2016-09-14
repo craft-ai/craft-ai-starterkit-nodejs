@@ -1,81 +1,84 @@
-import craftai, { Time } from 'craft-ai';
-import dotenv from 'dotenv';
+var craftai = require('craft-ai').createClient;
+var dotenv =require('dotenv');
+var fetch = require('node-fetch');
 
 dotenv.load();
 
-const CRAFT_AGENT = 'ROOM_R1';
-const TIME_QUANTUM = 20 * 60;
-
 // 0 - Create the craft client
-let CRAFT_CLIENT = craftai({
+var CRAFT_CLIENT = craftai({
   owner: process.env.CRAFT_OWNER,
-  token: process.env.CRAFT_TOKEN,
-  operationsChunksSize: 200
+  token: process.env.CRAFT_TOKEN
 });
 
-const CRAFT_MODEL = {
-  context: {
-    movement: {
-      type: 'enum'
-    },
-    light: {
-      type: 'enum'
-    },
-    time: {
-      type: 'time_of_day'
-    },
-    month: {
-      type: 'continuous'
-    },
-    tz: {
-      type: 'timezone'
-    }
-  },
-  output: ['light'],
-  time_quantum: TIME_QUANTUM
-};
-
 fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
-.then((response) => {
+.then(function(response) {
+  if (response.status >= 400) {
+    return response.json()
+      .catch(() => {
+        throw new Error(`Error ${response.status} when retrieving context data, invalid json returned.`);
+      })
+      .then(json => {
+        throw new Error(`Error ${response.status} when retrieving context data: ${json.message}`);
+      });
+  }
   return response.json();
 })
-.then((context) => {
-
+.then(function(context) {
   // 1 - Cleanup the mess (agent's name can't be duplicate)
-  return CRAFT_CLIENT.destroyAgent(CRAFT_AGENT)
+  return CRAFT_CLIENT.destroyAgent('ROOM_R1')
   // 2 - Create the agent
-  .then(() => {
-    console.log(`Creating agent ${CRAFT_AGENT} from the following model.`, CRAFT_MODEL);
-    return CRAFT_CLIENT.createAgent(CRAFT_MODEL, CRAFT_AGENT);
+  .then(function() {
+    console.log('Creating agent ROOM_R1.');
+    return CRAFT_CLIENT.createAgent({
+      context: {
+        movement: {
+          type: 'enum'
+        },
+        light: {
+          type: 'enum'
+        },
+        time: {
+          type: 'time_of_day'
+        },
+        month: {
+          type: 'continuous'
+        },
+        tz: {
+          type: 'timezone'
+        }
+      },
+      output: ['light'],
+      time_quantum: 20 * 60 // 20 min
+    }, 'ROOM_R1');
   })
   // 3 - Send the dataset's operations
-  .then(() => {
-    console.log(`Adding context operations to agent ${CRAFT_AGENT} from '${CRAFT_AGENT}' from twor.`);
-    return CRAFT_CLIENT.addAgentContextOperations(CRAFT_AGENT, context);
+  .then(function() {
+    console.log('Adding context operations to agent ROOM_R1 from \'ROOM_R1\' from twor.');
+    return CRAFT_CLIENT.addAgentContextOperations('ROOM_R1', context);
   })
-  .then(() => {
-    return CRAFT_CLIENT.getAgent(CRAFT_AGENT)
-    .then(() => {
-      console.log(`Operations successfully added to agent ${CRAFT_AGENT}`);
-    })
-    .then(() => CRAFT_CLIENT.getAgentInspectorUrl(CRAFT_AGENT, 1272745200));
+  .then(function() {
+    return CRAFT_CLIENT.getAgent('ROOM_R1')
+    .then(function() {
+      console.log('Operations successfully added to agent ROOM_R1');
+      return CRAFT_CLIENT.getAgentInspectorUrl('ROOM_R1', 1272745200);
+    });
   })
-  .then(url => console.log(`Agent ${CRAFT_AGENT} inspectable at ${url}`))
-  // 4 - Get some decisions
-  .then(() => {
+  .then(function(url) {
+    console.log('Agent ROOM_R1 inspectable at https://beta.craft.ai/inspector.');
+    // 4 - Get some decisions
     // Download the tree
-    return CRAFT_CLIENT.getAgentDecisionTree(CRAFT_AGENT, 1272745200);
+    return CRAFT_CLIENT.getAgentDecisionTree('ROOM_R1', 1272745200);
   })
-  .then((tree) => {
+  .then(function(tree) {
     console.log('Tree downloaded !');
     // Get a decision from it
-    let decision = craftai.decide(
+    var decision = craftai.decide(
       tree,
       {
         movement: 'OFF',
         month: 0
       },
-      new Time('2010-01-04T01:30:00')
+      new craftai.Time('2010-01-04T01:30:00')
     );
     console.log(`Decision taken: the light is ${decision.decision.light} when there is no movement on 2010-01-04T01:30:00.`);
     decision = craftai.decide(
@@ -84,9 +87,11 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
         movement: 'ON',
         month: 4
       },
-      new Time('2009-05-16T23:00:00')
+      new craftai.Time('2009-05-16T23:00:00')
     );
     console.log(`Decision taken: the light is ${decision.decision.light} when there is movement on 2009-05-16T23:00:00.`);
   });
 })
-.catch(error => console.log('Error!', error));
+.catch(function(error) {
+  console.log('Error!', error);
+});

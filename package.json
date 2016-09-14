@@ -14,10 +14,8 @@
     "url": "https://github.com/craft-ai/craft-ai-starterkit-nodejs.git"
   },
   "scripts": {
-    "build": "babel src --out-dir bin",
-    "start": "npm run build && node bin/learn.js",
-    "build-data": "babel src --out-dir data",
-    "prepare_data": "npm run build-data && node bin/prepare_data.js",
+    "start": "node src/learn.js",
+    "prepare_data": "node src/prepare.js",
     "lint": "eslint .",
     "fix_lint": "eslint --fix ."
   },
@@ -34,10 +32,6 @@
     "unzip": "0.1.11"
   },
   "devDependencies": {
-    "babel-cli": "6.1.18",
-    "babel-core": "6.2.1",
-    "babel-preset-es2015": "6.1.18",
-    "babel-eslint": "6.1.2",
     "eslint": "2.2.0",
     "eslint-config-craft-ai": "2.1.2",
     "eslint-plugin-react": "5.2.2"
