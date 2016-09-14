@@ -14,7 +14,7 @@
     "url": "https://github.com/craft-ai/craft-ai-starterkit-nodejs.git"
   },
   "scripts": {
-    "start": "node src/learn.js",
+    "start": "node src/main.js",
     "prepare_data": "node src/prepare.js",
     "lint": "eslint .",
     "fix_lint": "eslint --fix ."
