@@ -15,10 +15,10 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
   if (response.status >= 400) {
     return response.json()
       .catch(() => {
-        throw new Error(`Error ${response.status} when retrieving context data, invalid json returned.`);
+        throw new Error('Error ' + response.status + ' when retrieving context data, invalid json returned.');
       })
       .then(json => {
-        throw new Error(`Error ${response.status} when retrieving context data: ${json.message}`);
+        throw new Error('Error ' + response.status + ' when retrieving context data: ' + json.message);
       });
   }
   return response.json();
@@ -65,7 +65,7 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
   })
   .then(function(url) {
     console.log('Agent ROOM_R1 inspectable at https://beta.craft.ai/inspector.');
-    // 4 - Get some decisions
+    // 4 - Compute decision
     // Download the tree
     return CRAFT_CLIENT.getAgentDecisionTree('ROOM_R1', context[context.length - 1].timestamp);
   })
@@ -80,7 +80,7 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
       },
       new craftai.Time('2010-01-04T01:30:00')
     );
-    console.log(`Decision taken: the light is ${decision.decision.light} when there is no movement on 2010-01-04T01:30:00.`);
+    console.log('Decision taken: the light is ' + decision.decision.light + ' when there is no movement on 2010-01-04T01:30:00.');
     decision = craftai.decide(
       tree,
       {
@@ -89,7 +89,7 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
       },
       new craftai.Time('2009-05-16T23:00:00')
     );
-    console.log(`Decision taken: the light is ${decision.decision.light} when there is movement on 2009-05-16T23:00:00.`);
+    console.log('Decision taken: the light is ' + decision.decision.light + ' when there is movement on 2009-05-16T23:00:00.');
   });
 })
 .catch(function(error) {
