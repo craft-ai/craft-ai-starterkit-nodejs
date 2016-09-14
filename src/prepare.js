@@ -7,6 +7,9 @@ var path = require('path');
 var Promise = require('bluebird');
 var streamReduce = require('stream-reduce');
 var Time = require('craft-ai').createClient.Time;
+var rimraf = require('rimraf');
+var http = require('http');
+var unzip = require('unzip');
 
 dotenv.load();
 
@@ -52,7 +55,7 @@ new Promise(function(resolve, reject) {
 // 1 - Download the dataset
 .then(function() {
   return new Promise(function(resolve, reject) {
-    http.get(DATASET_URL, function(response) {
+    http.get('http://ailab.wsu.edu/casas/datasets/twor.2010.zip', function(response) {
       console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
       response
       .pipe(unzip.Extract({
@@ -62,7 +65,7 @@ new Promise(function(resolve, reject) {
         resolve();
       })
       .on('error', function(err) {
-        reject(err)
+        reject(err);
       });
     });
   });
@@ -95,12 +98,12 @@ new Promise(function(resolve, reject) {
       var addition = moment(acc.startingTime);
       while (acc.startingTime && addition.add('20', 'm').unix() <= datetimeInTz.unix()) {
         acc.diffs.push({ timestamp: acc.startingTime.unix(), diff: { month: acc.startingTime.month(), movement: acc.movement.toString(), tz: Time(acc.startingTime).timezone } });
-        startingTime = moment(addition);
+        acc.startingTime = moment(addition);
         acc.movement = isMoving(acc.sensorsValues);
       }
       if (_.indexOf(SENSORS_CONTEXT, data.sensor) != -1) {
         acc.sensorsValues[data.sensor] = data.value;
-        acc.movement = value == 'ON' || acc.movement;
+        acc.movement = data.value == 'ON' || acc.movement;
       }
       return {
         startingTime: acc.startingTime,
@@ -118,7 +121,7 @@ new Promise(function(resolve, reject) {
     }))
     .pipe(es.map(function(data, cb) {
       var diffs = _.sortBy(data.diffs, function(diff) {
-       return diff.timestamp
+        return diff.timestamp;
       });
       cb(null, JSON.stringify(diffs, null, '  '));
     }))
