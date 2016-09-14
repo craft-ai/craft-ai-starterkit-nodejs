@@ -14,22 +14,22 @@ in Node.js using [**craft ai** official js client](https://www.npmjs.com/package
 
 ## Usage ##
 
-### Configure ###
+### Context ###
 
-Edit `src/cfg.js` to update the configuration.
+For this example, we use real data from a house with 2 residents.
+This house is equipped with movement sensors, light sensors, etc.
 
-### Retrieve and prepare data ###
+Here we will only use the movement sensors and the light sensor in one room.
+We prepare the data by merging all the data of the movement sensors, to see if there is movement in a certain duration.
 
-```console
-> npm run prepare
-```
+### Goal ###
 
-> Take a look at `data/{dataset}/metadata.json`
+See the light activity based on movement, date and time.
 
 ### Create an agent and send data ###
 
 ```console
-> npm run learn
+> npm run start
 ```
 
 ### Resources ###
