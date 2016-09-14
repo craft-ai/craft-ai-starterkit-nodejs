@@ -15,10 +15,10 @@ fetch('http://craft.ai/content/data/twor_ROOM_R1.json')
 .then(function(response) {
   if (response.status >= 400) {
     return response.json()
-      .catch(() => {
+      .catch(function() {
         throw new Error('Error ' + response.status + ' when retrieving context data, invalid json returned.');
       })
-      .then(json => {
+      .then(function(json) {
         throw new Error('Error ' + response.status + ' when retrieving context data: ' + json.message);
       });
   }
