@@ -22,11 +22,17 @@ The following will:
 1. create an agent, 
 2. add a bunch of context operations from the example dataset, 
 3. compute a decision tree and 
-4. take a few decisions, this is how you'd do the automation with data from real devices.
+4. take a few decisions.
 
 ```console
 > npm run start
 ```
+
+### What do next ? ###
+
+Now that you know how to compute your decision tree, you are able to complete the initial goal: automate the room's light using actual devices.
+
+You can use the devices input to add context operations in real time and compute a decision when the context changes that can be used, in conjuction with its confidence, to turn the light on or off.
 
 ## About the dataset ##
 
@@ -50,11 +56,5 @@ If you want to pre-treat by yourself, you could run:
 The result will be set in `data/twor.2010`.
 
 This runs `src/prepare.js`, you can check out this file to see what we've done and make your own preparation.
-
-
-### What do next ? ###
-
-Now, that you have your decision tree, you are able to complete the initial goal: automate the room's light.
-With it you can compute decision and get a result with a confidence, that can help you to decide if you turn the light on or off.
 
 > The **craft ai** user documentation can be found at <https://beta.craft.ai/doc> and technical questions can be sent by email at [support@craft.ai]('mailto:support@craft.ai').
