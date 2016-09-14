@@ -14,23 +14,44 @@ in Node.js using [**craft ai** official js client](https://www.npmjs.com/package
 
 ## Usage ##
 
-### Context ###
-
-For this example, we use real data from a house with 2 residents.
-This house is equipped with movement sensors, light sensors, etc.
-
-Here we will only use the movement sensors and the light sensor in one room.
-We prepare the data by merging all the data of the movement sensors, to see if there is movement in a certain duration.
-
 ### Goal ###
 
-See the light activity based on movement, date and time.
+Automate the light in a room based on movement, date and time.
 
-### Create an agent and send data ###
+### Context ###
+
+In order to reach our goal, we use real data from a house with 2 residents, gathered around 1 year (2009 - 2010) academic year.
+This house is equipped with sensors like motion, light, temperature, door, etc, in all the rooms.
+All the data came from the dataset twor2010 that can be found [here](http://ailab.wsu.edu/casas/datasets/).
+
+In this particular example, we will show you how to use craft ai to do this automation.
+
+### Preparation ###
+
+Here we will only use the movement sensors and the light sensor in one room, here the bedroom of one of the residents.
+We prepare the data by merging all the data of the movement sensors, to see if there is movement in a certain duration.
+
+The pre-treated data are already computed and available for this example.
+
+But if you want to pre-treat by yourself, you could run:
+
+```console
+> npm run prepare_data.
+```
+
+The result will be set in data/twor.2010.
+
+### Create an agent, send data and get a decision tree ###
 
 ```console
 > npm run start
 ```
+
+
+### What do next ? ###
+
+Now, that you have your decision tree, you are able to complete the initial goal: automate the room's light.
+With it you can compute decision and get a result with a confidence, that can help you to decide if you turn the light on or off.
 
 ### Resources ###
 
