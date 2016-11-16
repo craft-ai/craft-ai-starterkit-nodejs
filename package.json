@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "bluebird": "3.4.0",
-    "craft-ai": "0.1.14",
+    "craft-ai": "0.1.16",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
     "lodash": "4.13.1",
