@@ -17,11 +17,12 @@
     "start": "node src/main.js",
     "prepare_data": "node src/prepare.js",
     "lint": "eslint .",
-    "fix_lint": "eslint --fix ."
+    "fix_lint": "eslint --fix .",
+    "postinstall": "cd node_modules/craft-ai && npm install && npm run build"
   },
   "dependencies": {
     "bluebird": "3.4.0",
-    "craft-ai": "0.1.16",
+    "craft-ai": "git://github.com/craft-ai/craft-ai-client-js.git#feature/v1",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
     "lodash": "4.13.1",
