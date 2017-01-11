@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "bluebird": "3.4.0",
-    "craft-ai": "git://github.com/craft-ai/craft-ai-client-js.git#feature/v1",
+    "craft-ai": "git://github.com/craft-ai/craft-ai-client-js.git#feature/ClientHandleIntervals",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
     "lodash": "4.13.1",
