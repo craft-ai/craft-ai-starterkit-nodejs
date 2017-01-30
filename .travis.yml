@@ -1,27 +1,10 @@
 language: node_js
 node_js:
-- '4'
-- '0.12'
+- '6.9'
 before_install: npm prune
 before_cache: npm prune
 install: npm install
-script: npm run start
-deploy:
-- provider: npm
-  email: ops@craft.ai
-  api_key:
-    secure: eNf/9wOC/uoHKKZGhUG1CGryKHBxuUIUkZhis/TVAGvh65D3LRfWU9kbGTbWmrFV7dQXgMRtZ0OZhevQ5c27gpVZKvIaNZynV53PpBtUwbtOE2vjbdie58PCNo7GKIJsAVfeiQta3pUUq6r9ZyN0573ROch+0pD2bNDLh+YT+JC54lnvGvceOZwajCsITecUgl7aev//6gnWr0cW3TDhNFyhAhpoy0r92g25i4M1IQ8D2nLZ46Wpi0ISL7xlT2DDp45w2ltu1bpJctNhymt1KTduTUbUHymVNceaHzq7llMA4DNhqtXD928JRa/TG2tnor9X7sGd4PUtheEsCJTX7OVrDMQnRnZTMRBXg3VBM/zLoNd6VLh38kddBQfh4cnlqYRyzcPdT5tbBYwmv34BdpdAXoApd0n5hPWkTSBFhFqGcP+h8sU2xv1U96o6X0atCzZdo/2RvUfbqEOdqWRHSOc/suhEyGordJbH3TGE7W0OaWsuUzjm0b+HNcpWKFp2vdhjAgwLxZQ1WvMyXmSOqeQ1GCMbYMjcTiP/U2tpq4+SnNVzeAzZaFJ1TiSS0x18F/hl9FukBOdv1jxXH1AulCxi54EcIZjnMVni7J4oIRz+iMk1qCIS/UbZsEmGIzBWlYGqwKeZTO5eF48M6LBR/+aimhREKvaoyek/dJjdGQE=
-  on:
-    tags: true
-    repo: craft-ai/craft-ai-starterkit-nodejs
-    node: '0.12'
-  skip_cleanup: true
-- provider: script
-  script: npm run gh_deploy
-  on:
-    tags: true
-    repo: craft-ai/craft-ai-starterkit-nodejs
-    node: '0.12'
+script: npm start
 env:
   global:
   - CRAFT_OWNER=stanley_kubick

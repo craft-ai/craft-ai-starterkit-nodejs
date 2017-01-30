@@ -1,5 +1,7 @@
 # **craft ai** JavaScript starter kit #
 
+[![Build](https://img.shields.io/travis/craft-ai/craft-ai-starterkit-nodejs/master.svg?style=flat-square)](https://travis-ci.org/craft-ai/craft-ai-starterkit-nodejs) [![License](https://img.shields.io/badge/license-BSD--3--Clause-42358A.svg?style=flat-square)](LICENSE)
+
 [**craft ai** _AI-as-a-service_](http://craft.ai) enables developers to create Apps and Things that adapt to each user. To go beyond useless dashboards and spammy notifications, **craft ai** learns how users behave to automate recurring tasks, make personalized recommendations, or detect anomalies.
 
 This repository hosts a fully working application, in a **Smart Home** context, integrating [**craft ai**](http://craft.ai) written in Node.js using [**craft ai** official js client](https://www.npmjs.com/package/craft-ai).
