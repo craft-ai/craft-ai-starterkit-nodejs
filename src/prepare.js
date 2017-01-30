@@ -2,12 +2,13 @@ const _ = require('lodash');
 const dotenv = require('dotenv');
 const es = require('event-stream');
 const fs = require('fs');
+const http = require('http');
 const moment = require('moment');
 const path = require('path');
+const process = require('process');
+const rimraf = require('rimraf');
 const streamReduce = require('stream-reduce');
 const Time = require('craft-ai').createClient.Time;
-const rimraf = require('rimraf');
-const http = require('http');
 const unzip = require('unzip');
 
 dotenv.load();
@@ -138,4 +139,5 @@ new Promise((resolve, reject) => {
 })
 .catch(err => {
   console.log('Error', err);
+  process.exit(1);
 });

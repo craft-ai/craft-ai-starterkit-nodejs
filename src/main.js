@@ -1,7 +1,8 @@
 const craftai = require('craft-ai').createClient;
-const dotenv =require('dotenv');
-const path = require('path');
+const dotenv = require('dotenv');
 const fs = require('fs');
+const path = require('path');
+const process = require('process');
 
 dotenv.load();
 
@@ -100,4 +101,5 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
 })
 .catch(error => {
   console.log('Error!', error);
+  process.exit(1);
 });
