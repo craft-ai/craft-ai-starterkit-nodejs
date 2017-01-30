@@ -9,7 +9,7 @@ The end goal: automate the light in a room based on _motion sensors_, _date/time
 ## Setup ##
 
 - Download or clone the [sources from GitHub](https://github.com/craft-ai/craft-ai-starterkit-nodejs),
-- Install [Node.js](https://nodejs.org/en/download/) on your computer,
+- Install [Node.js](https://nodejs.org/en/download/) on your computer (version 6.9 is recommended),
 - Install dependencies by running `npm install` in a terminal from the directory where the sources are.
 - in this directory, create a `.env` file setting the following variables:
     - `CRAFT_TOKEN` allows you to [authenticate your calls to the **craft ai** API](https://beta.craft.ai/doc/js#1---retrieve-your-credentials),
@@ -19,9 +19,9 @@ The end goal: automate the light in a room based on _motion sensors_, _date/time
 
 The following will:
 
-1. create an agent, 
-2. add a bunch of context operations from the example dataset, 
-3. compute a decision tree and 
+1. create an agent,
+2. add a bunch of context operations from the example dataset,
+3. compute a decision tree and
 4. take a few decisions.
 
 ```console
@@ -36,7 +36,7 @@ You can use the devices input to add context operations in real time and compute
 
 ## About the dataset ##
 
-This starter kit uses real data extracted from a public dataset. 
+This starter kit uses real data extracted from a public dataset.
 
 The dataset _"twor.2010"_ was made available by the [CASAS group of Washington State University](http://casas.wsu.edu); the original dataset can be found [here](http://ailab.wsu.edu/casas/datasets/). It comes from a house with 2 residents, gathered around 1 year (2009 - 2010) academic year. This house is equipped with sensors like motion, light, temperature, door, etc, in all the rooms.
 
