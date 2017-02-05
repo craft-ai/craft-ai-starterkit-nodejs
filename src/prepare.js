@@ -46,7 +46,7 @@ function createDatasetReadStream(path) {
   });
 }
 
-function diffOperationStream(initialState, os) {
+function diffOperationStream(os) {
   let state = {};
   return os.consume((err, op, push, next) => {
     if (err) {
@@ -57,7 +57,7 @@ function diffOperationStream(initialState, os) {
       push(null, highland.nil);
     }
     else {
-      const newState = _.extend({}, initialState, state, op.diff);
+      const newState = _.extend({}, state, op.diff);
       const diff = _.pickBy(newState, (value, key) => value !== state[key]);
       state = newState;
       if (_.size(diff) > 0) {
@@ -66,6 +66,37 @@ function diffOperationStream(initialState, os) {
           diff: diff
         });
       }
+      next();
+    }
+  });
+}
+function mergeCloseOperations(os, threshold = 1) {
+  let operation = {
+    timestamp: null,
+    diff: {}
+  };
+  return os.consume((err, newOperation, push, next) => {
+    if (err) {
+      push(err);
+      next();
+    }
+    else if (newOperation === highland.nil) {
+      if (operation.timestamp) {
+        push(null, operation);
+      }
+      push(null, highland.nil);
+    }
+    else if (!operation.timestamp) {
+      operation = newOperation;
+      next();
+    }
+    else if (newOperation.timestamp - operation.timestamp < threshold) {
+      operation.diff = _.extend(operation.diff, newOperation.diff);
+      next();
+    }
+    else {
+      push(null, operation);
+      operation = newOperation;
       next();
     }
   });
@@ -100,88 +131,40 @@ new Promise((resolve, reject) => {
   return new Promise((resolve, reject) => {
     console.log('Extracting the metadata from dataset \'twor.2010\'...');
 
-    const eventStream = createDatasetReadStream(path.join(DATA_DIR, './twor.2010/data'))
+    const fullOperationsStream = createDatasetReadStream(path.join(DATA_DIR, './twor.2010/data'))
     .filter(({ device }) => _.includes(ALL_DEVICES, device))
-    .filter(({ time }) => time.timestamp > 1262300400); // Before then the light appears to be buggy
-
-    const BATCH_DURATION = 20*60;
-    let currentBatchTimestamp = null;
-    let currentBatch = [];
-    const eventBatchStream = eventStream
-    .consume((err, evt, push, next) => {
-      if (err) {
-        push(err);
-        next();
-      }
-      else if (evt === highland.nil) {
-        push(null, currentBatch);
-        push(null, highland.nil);
-      }
-      else {
-        if (!currentBatchTimestamp) {
-          currentBatchTimestamp = evt.time.timestamp;
-        }
-        if (evt.time.timestamp > (currentBatchTimestamp + BATCH_DURATION)) {
-          push(null, _.clone(currentBatch));
-          currentBatch = [];
-          currentBatchTimestamp = evt.time.timestamp;
-        }
-        currentBatch.push(evt);
-        next();
-      }
-    });
-
-    const operationsStream = eventBatchStream
-    .map(evtBatch => {
-      let ops = [];
-      // Tz
-      ops = _.reduce(evtBatch, (ops, { time }) => {
-        const previousTz = ops.length === 0 ? null : _.last(ops).diff.tz;
-        if (time.timezone != previousTz) {
-          ops.push({
-            timestamp: time.timestamp,
-            diff: {
-              tz: time.timezone
-            }
-          });
-        }
-        return ops;
-      }, ops);
-      // Light
-      const lightEvtBatch = evtBatch.filter(({ device }) => _.includes(LIGHT_DEVICES, device));
-      ops = _.reduce(lightEvtBatch, (ops, { time, value }) => {
-        ops.push({
-          timestamp: time.timestamp,
-          diff: {
-            light: value
-          }
-        });
-        return ops;
-      }, ops);
-      // Motion
-      const movementEvtBatch = evtBatch.filter(({ device }) => _.includes(MOVEMENT_SENSOR_DEVICES, device));
-      const movementStateBool = _.reduce(movementEvtBatch, (m, { value }) => (m || value === 'ON'), false);
-      ops.push({
-        timestamp: _.first(evtBatch).time.timestamp,
+    //.filter(({ time }) => time.timestamp > 1262300400) // Before then the light appears to be buggy
+    .map(({ time, device, value }) => {
+      let operation = {
+        timestamp: time.timestamp,
         diff: {
-          movement: movementStateBool ? 'YES' : 'NO'
+          tz: time.timezone
         }
-      });
-
-      const groupedOps = _.map(_.groupBy(ops, 'timestamp'), (opsGroup, timestamp) => ({
-        timestamp: parseInt(timestamp),
-        diff: _.reduce(opsGroup, (diff, op) => _.extend({}, diff, op.diff), {})
-      }));
-
-      return _.sortBy(groupedOps, 'timestamp');
+      };
+      operation.diff[device] = value;
+      return operation;
     })
-    .sequence(); // Flatten the stream of operations arrays to a stream of operations
+    .scan1((previousOp, op) => ({
+      timestamp: op.timestamp,
+      diff: _.extend({}, previousOp.diff, op.diff)
+    }))
+    .map(({ timestamp, diff }) => {
+      const movementValues = _.filter(diff, (value, device) => _.includes(MOVEMENT_SENSOR_DEVICES, device));
+      const counts = _.countBy(movementValues);
+      return {
+        timestamp: timestamp,
+        diff: {
+          tz: diff.tz,
+          light: diff['L001'],
+          movement: counts['ON'] || 0
+        }
+      };
+    })
+    .filter(({ diff }) => diff.tz && diff.light && diff.movement); // Filter the incomplete operations
 
-    const diffedOperationStream = diffOperationStream({
-      tz: '',
-      movement: 'NO',
-      light: 'OFF'
-    }, operationsStream);
+    const mergeOperationStream = mergeCloseOperations(fullOperationsStream, 10);
+
+    const diffedOperationStream = diffOperationStream(mergeOperationStream);
 
     const outputStream = fs.createWriteStream(path.join(DATA_DIR, './twor.2010/twor_ROOM_R1.json'));
     outputStream.on('close', () => resolve());

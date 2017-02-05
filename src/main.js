@@ -47,7 +47,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     return CRAFT_CLIENT.createAgent({
       context: {
         movement: {
-          type: 'enum'
+          type: 'continuous'
         },
         light: {
           type: 'enum'
@@ -57,13 +57,10 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         time: {
           type: 'time_of_day'
-        },
-        day: {
-          type: 'day_of_week'
         }
       },
       output: ['light'],
-      time_quantum: 10 * 60 // 10 min
+      time_quantum: 5 * 60 // 5 min
     }, 'ROOM_R1');
   })
   // 4 - Send the dataset's operations
@@ -80,22 +77,66 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
   .then(tree => {
     console.log('Decision tree retrieved!');
     // 6 - Get decisions
-    const decision1 = craftai.decide(
-      tree,
-      {
-        movement: 'NO'
-      },
-      new craftai.Time('2010-01-04T01:30:00')
-    );
-    console.log(`Decision taken: the light is ${decision1.decision.light} when there is no movement on 2010-01-04T01:30:00.`);
-    const decision2 = craftai.decide(
-      tree,
-      {
-        movement: 'YES'
-      },
-      new craftai.Time('2009-05-16T23:00:00')
-    );
-    console.log(`Decision taken: the light is ${decision2.decision.light} when there is movement on 2009-05-16T23:00:00.`);
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 0
+        },
+        new craftai.Time('2010-01-04T01:30:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is no movement at 1:30AM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 0
+        },
+        new craftai.Time('2010-01-04T09:42:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is no movement at 9:42AM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 2
+        },
+        new craftai.Time('2010-01-04T09:42:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is some movement at 9:42AM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 2
+        },
+        new craftai.Time('2010-01-04T20:30:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is some movement at 8:30PM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 6
+        },
+        new craftai.Time('2010-01-04T09:42:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is a lot of movement at 9:42AM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 6
+        },
+        new craftai.Time('2010-01-04T02:17:00+09:00')
+      );
+      console.log(`Decision taken: the light is ${d.decision.light} when there is a lot of movement at 2:17AM.`);
+    }
   });
 })
 .catch(error => {

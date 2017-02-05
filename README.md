@@ -6,7 +6,7 @@
 
 This repository hosts a fully working application, in a **Smart Home** context, integrating [**craft ai**](http://craft.ai) written in Node.js using [**craft ai** official js client](https://www.npmjs.com/package/craft-ai).
 
-The end goal: automate the light in a room based on _motion sensors_, _date/time_. Using **craft ai**, this simple application learns when (_date/time_) each household prefers the light to be turned when a motion is detected.
+The end goal: automate the _light_ in a room based on _motion sensors_ and _time_. Using **craft ai**, this simple application learns when each household prefers the light to be turned when a motion is detected.
 
 ## Setup ##
 
@@ -47,7 +47,7 @@ The dataset _"twor.2010"_ was made available by the [CASAS group of Washington S
 > The pre-treated data are already computed and available for this example.
 
 We only use the movement sensors and the light sensor from one room: the bedroom of one of the residents.
-From the original data, we selected the desired sensors: one lightbulb and several motion sensor that we merge to a unique flag telling if at least one of the detector was activated in the past 20 minutes.
+From the original data, we selected the desired sensors: one lightbulb and several motion sensors that we merge to a unique indicator counting the number of sensors detecting movements.
 
 If you want to pre-treat by yourself, you could run:
 
