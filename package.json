@@ -23,8 +23,9 @@
     "craft-ai": "0.1.18",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
+    "highland": "2.10.1",
     "lodash": "4.13.1",
-    "moment": "2.14.1",
+    "moment-timezone": "0.5.11",
     "rimraf": "2.5.4",
     "stream-reduce": "1.0.3",
     "unzip": "0.1.11"

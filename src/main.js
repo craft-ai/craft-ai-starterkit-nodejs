@@ -21,7 +21,8 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
   resolve(data);
 }))
 .then(data => JSON.parse(data))
-.catch(() => {
+.catch(err => {
+  console.log(err);
   console.log(`Retrieving the data file from '${REMOTE_FILE_PATH}'...`);
   return fetch(REMOTE_FILE_PATH)
   .then((response) => {
@@ -51,18 +52,18 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         light: {
           type: 'enum'
         },
+        tz: {
+          type: 'timezone'
+        },
         time: {
           type: 'time_of_day'
         },
-        month: {
-          type: 'continuous'
-        },
-        tz: {
-          type: 'timezone'
+        day: {
+          type: 'day_of_week'
         }
       },
       output: ['light'],
-      time_quantum: 20 * 60 // 20 min
+      time_quantum: 10 * 60 // 10 min
     }, 'ROOM_R1');
   })
   // 4 - Send the dataset's operations
@@ -82,8 +83,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     const decision1 = craftai.decide(
       tree,
       {
-        movement: 'OFF',
-        month: 0
+        movement: 'NO'
       },
       new craftai.Time('2010-01-04T01:30:00')
     );
@@ -91,8 +91,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     const decision2 = craftai.decide(
       tree,
       {
-        movement: 'ON',
-        month: 4
+        movement: 'YES'
       },
       new craftai.Time('2009-05-16T23:00:00')
     );
