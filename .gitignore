@@ -1,4 +1,5 @@
 node_modules
 bin
-data
+download
 .env
+npm-debug.log

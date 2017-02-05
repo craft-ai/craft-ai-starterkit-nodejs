@@ -13,23 +13,50 @@ const unzip = require('unzip');
 dotenv.load();
 
 const DATA_DIR = path.join(__dirname, '../data');
+const DOWNLOAD_DIR = path.join(__dirname, '../download');
 
 // We're considering R1, the top left room (sensors layout from 'sensorlayout2.png')
-const MOVEMENT_SENSOR_DEVICES = [
-  'M044',
-  'M045',
-  'M046',
-  'M047',
-  'M048',
-  'M049',
-  'M050'
-];
-
-const LIGHT_DEVICES = [
-  'L001'
-];
-
-const ALL_DEVICES = _.concat(MOVEMENT_SENSOR_DEVICES, LIGHT_DEVICES);
+const ROOMS = {
+  BEDROOM_1: {
+    MOTION_SENSORS: [
+      'M044',
+      'M045',
+      'M046',
+      'M047',
+      'M048',
+      'M049',
+      'M050'
+    ],
+    LIGHT: 'L001'
+  },
+  RESTROOM: {
+    MOTION_SENSORS: [
+      'M040',
+      'M041'
+    ],
+    LIGHT: 'L007'
+  },
+  LIVING_ROOM: {
+    MOTION_SENSORS: [
+      'M001',
+      'M002',
+      'M003',
+      'M004',
+      'M005',
+      'M006',
+      'M007',
+      'M008',
+      'M009',
+      'M010',
+      'M011',
+      'M012',
+      'M013',
+      'M014',
+      'M015'
+    ],
+    LIGHT: 'L008'
+  }
+};
 
 function createDatasetReadStream(path) {
   return highland(fs.createReadStream(path))
@@ -70,6 +97,7 @@ function diffOperationStream(os) {
     }
   });
 }
+
 function mergeCloseOperations(os, threshold = 1) {
   let operation = {
     timestamp: null,
@@ -102,83 +130,82 @@ function mergeCloseOperations(os, threshold = 1) {
   });
 }
 
-// 1 - Clear the previously retrieved data
+// 1 - Download the dataset
 new Promise((resolve, reject) => {
-  return rimraf(path.join(DATA_DIR, './twor.2010/twor_ROOM_R1.json'), err => {
-    return err ? reject(err) : resolve();
-  });
-})
-// 2 - Download the dataset
-.then(() => {
-  return new Promise((resolve, reject) => {
-    http.get('http://ailab.wsu.edu/casas/datasets/twor.2010.zip', response => {
-      console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
-      response
-      .pipe(unzip.Extract({
-        path: DATA_DIR
-      }))
-      .on('close', () => {
-        resolve();
-      })
-      .on('error', err => {
-        reject(err);
-      });
+  http.get('http://ailab.wsu.edu/casas/datasets/twor.2010.zip', response => {
+    console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
+    response
+    .pipe(unzip.Extract({
+      path: DOWNLOAD_DIR
+    }))
+    .on('close', () => {
+      resolve();
+    })
+    .on('error', err => {
+      reject(err);
     });
   });
 })
 // 3 - Parse the data to retrieve the sensors and their values
-.then(() => {
+.then(() => createDatasetReadStream(path.join(DOWNLOAD_DIR, './twor.2010/data')))
+.then(stream => Promise.all(_.map(ROOMS, (devices, room) => {
+  const outputFile = path.join(DATA_DIR, `./twor_${room}.json`);
+  const selectedDevices = _.concat(devices.MOTION_SENSORS, [devices.LIGHT]);
+  const fullOperationsStream = stream
+  .fork()
+  .filter(({ device }) => _.includes(selectedDevices, device))
+  .map(({ time, device, value }) => {
+    let operation = {
+      timestamp: time.timestamp,
+      diff: {
+        tz: time.timezone
+      }
+    };
+    operation.diff[device] = value;
+    return operation;
+  })
+  .scan1((previousOp, op) => ({
+    timestamp: op.timestamp,
+    diff: _.extend({}, previousOp.diff, op.diff)
+  }))
+  .map(({ timestamp, diff }) => {
+    const movementValues = _.filter(diff, (value, device) => _.includes(devices.MOTION_SENSORS, device));
+    const counts = _.countBy(movementValues);
+    return {
+      timestamp: timestamp,
+      diff: {
+        tz: diff.tz,
+        light: _.includes(['OFF', 'Unknown'], diff[devices.LIGHT]) ? 'OFF' : 'ON',
+        movement: counts['ON'] || 0
+      }
+    };
+  })
+  .filter(({ diff }) => diff.tz && diff.light && diff.movement); // Filter the incomplete operations
+
+  const mergedOperationsStream = mergeCloseOperations(fullOperationsStream, 10);
+
+  const diffedsOperationStream = diffOperationStream(mergedOperationsStream);
+
+  const dataStream = highland([
+    highland(['[\n  ']),
+    diffedsOperationStream.map(operation => JSON.stringify(operation)).intersperse(',\n  '),
+    highland(['\n]\n'])
+  ])
+  .sequence();
+
   return new Promise((resolve, reject) => {
-    console.log('Extracting the metadata from dataset \'twor.2010\'...');
+    rimraf(outputFile, err => err ? reject(err) : resolve());
+  })
+  .then(() => new Promise((resolve, reject) => {
+    console.log(`Building the operation history for room ${room} from 'twor.2010'...`);
 
-    const fullOperationsStream = createDatasetReadStream(path.join(DATA_DIR, './twor.2010/data'))
-    .filter(({ device }) => _.includes(ALL_DEVICES, device))
-    //.filter(({ time }) => time.timestamp > 1262300400) // Before then the light appears to be buggy
-    .map(({ time, device, value }) => {
-      let operation = {
-        timestamp: time.timestamp,
-        diff: {
-          tz: time.timezone
-        }
-      };
-      operation.diff[device] = value;
-      return operation;
-    })
-    .scan1((previousOp, op) => ({
-      timestamp: op.timestamp,
-      diff: _.extend({}, previousOp.diff, op.diff)
-    }))
-    .map(({ timestamp, diff }) => {
-      const movementValues = _.filter(diff, (value, device) => _.includes(MOVEMENT_SENSOR_DEVICES, device));
-      const counts = _.countBy(movementValues);
-      return {
-        timestamp: timestamp,
-        diff: {
-          tz: diff.tz,
-          light: diff['L001'],
-          movement: counts['ON'] || 0
-        }
-      };
-    })
-    .filter(({ diff }) => diff.tz && diff.light && diff.movement); // Filter the incomplete operations
-
-    const mergeOperationStream = mergeCloseOperations(fullOperationsStream, 10);
-
-    const diffedOperationStream = diffOperationStream(mergeOperationStream);
-
-    const outputStream = fs.createWriteStream(path.join(DATA_DIR, './twor.2010/twor_ROOM_R1.json'));
+    const outputStream = fs.createWriteStream(outputFile);
     outputStream.on('close', () => resolve());
     outputStream.on('error', err => reject(err));
 
-    highland([
-      highland(['[\n  ']),
-      diffedOperationStream.map(operation => JSON.stringify(operation)).intersperse(',\n  '),
-      highland(['\n]\n'])
-    ])
-    .sequence()
-    .pipe(outputStream);
-  });
-})
+    dataStream.pipe(outputStream);
+  }));
+})))
 .then(() => {
   console.log('Preparation of dataset \'twor.2010\' successful!');
 })
