@@ -72,7 +72,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T01:30:00+09:00')
       );
-      console.log(`Decision taken: the light is ${d.decision.light} when there is no movement at 1:30AM.`);
+      console.log(`Decision taken:\n- The light is ${d.decision.light} when there is no movement at 1:30AM.`);
     }
     {
       const d = craftai.decide(
