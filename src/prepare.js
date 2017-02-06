@@ -175,7 +175,7 @@ new Promise((resolve, reject) => {
       timestamp: timestamp,
       diff: {
         tz: diff.tz,
-        light: _.includes(['OFF', 'Unknown'], diff[devices.LIGHT]) ? 'OFF' : 'ON',
+        light: diff[devices.LIGHT] && (_.includes(['OFF', 'Unknown'], diff[devices.LIGHT]) ? 'OFF' : 'ON'),
         movement: counts['ON'] || 0
       }
     };
