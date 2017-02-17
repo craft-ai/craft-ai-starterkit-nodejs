@@ -1,10 +1,9 @@
+require('dotenv').load();
+
 const craftai = require('craft-ai').createClient;
-const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
-
-dotenv.load();
 
 const ROOM = 'BEDROOM_1';
 // const ROOM = 'LIVING_ROOM';
