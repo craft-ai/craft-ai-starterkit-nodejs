@@ -1,10 +1,9 @@
+require('dotenv').load();
+
 const craftai = require('craft-ai').createClient;
-const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
-
-dotenv.load();
 
 const ROOM = 'BEDROOM_1';
 // const ROOM = 'LIVING_ROOM';
@@ -27,7 +26,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
 .then(context => {
   const agentName = ROOM;
   // 2 - Cleanup the mess (agent's name can't be duplicate)
-  return CRAFT_CLIENT.destroyAgent(agentName)
+  return CRAFT_CLIENT.deleteAgent(agentName)
   // 3 - Create the agent
   .then(() => {
     console.log(`Creating agent ${agentName}.`);
