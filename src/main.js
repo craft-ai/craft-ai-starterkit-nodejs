@@ -46,7 +46,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         }
       },
       output: ['light'],
-      time_quantum: 5 * 60 // 5 min
+      time_quantum: 15 * 60 // 15 min
     }, agentName);
   })
   // 4 - Send the dataset's operations
@@ -119,9 +119,19 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         {
           movement: 2
         },
-        new craftai.Time('2010-01-04T20:30:00+09:00')
+        new craftai.Time('2010-01-04T20:55:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is some movement at 8:30PM.`);
+      console.log(`- The light is ${d.decision.light} when there is some movement at 8:55PM.`);
+    }
+    {
+      const d = craftai.decide(
+        tree,
+        {
+          movement: 2
+        },
+        new craftai.Time('2010-01-04T22:07:00+09:00')
+      );
+      console.log(`- The light is ${d.decision.light} when there is some movement at 10:07PM.`);
     }
     {
       const d = craftai.decide(
