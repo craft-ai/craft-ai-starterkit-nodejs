@@ -14,6 +14,7 @@ const LOCAL_FILE_PATH = path.join(__dirname, `../data/twor_${ROOM}.json`);
 // 0 - Create the craft client
 const CRAFT_CLIENT = craftai({
   owner: process.env.CRAFT_OWNER,
+  project: process.env.CRAFT_PROJECT,
   token: process.env.CRAFT_TOKEN
 });
 

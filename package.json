@@ -14,13 +14,14 @@
     "url": "https://github.com/craft-ai/craft-ai-starterkit-nodejs.git"
   },
   "scripts": {
+    "build-craft-ai": "cd node_modules/craft-ai && npm install && npm run build",
     "start": "node src/main.js",
     "prepare_data": "node src/prepare.js",
     "lint": "eslint .",
     "fix_lint": "eslint --fix ."
   },
   "dependencies": {
-    "craft-ai": "0.1.21",
+    "craft-ai": "git://github.com/craft-ai/craft-ai-client-js.git#feature/project",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
     "highland": "2.10.1",
