@@ -21,7 +21,7 @@
     "fix_lint": "eslint --fix ."
   },
   "dependencies": {
-    "craft-ai": "git://github.com/craft-ai/craft-ai-client-js.git#feature/project",
+    "craft-ai": "0.1.22",
     "dotenv": "2.0.0",
     "event-stream": "3.3.4",
     "highland": "2.10.1",
