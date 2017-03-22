@@ -21,20 +21,20 @@
     "fix_lint": "eslint --fix ."
   },
   "dependencies": {
-    "craft-ai": "0.1.22",
-    "dotenv": "2.0.0",
+    "craft-ai": "1.0.0",
+    "dotenv": "4.0.0",
     "event-stream": "3.3.4",
-    "highland": "2.10.1",
-    "lodash": "4.13.1",
+    "highland": "2.10.4",
+    "lodash": "4.17.4",
     "moment-timezone": "0.5.11",
-    "rimraf": "2.5.4",
+    "rimraf": "2.6.1",
     "stream-reduce": "1.0.3",
     "unzip": "0.1.11"
   },
   "devDependencies": {
-    "eslint": "2.2.0",
+    "eslint": "3.18.0",
     "eslint-config-craft-ai": "2.1.2",
-    "eslint-plugin-react": "5.2.2"
+    "eslint-plugin-react": "6.10.3"
   },
   "engines": {
     "node": "6.9.1"

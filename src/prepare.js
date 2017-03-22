@@ -84,13 +84,13 @@ function diffOperationStream(os) {
       push(null, highland.nil);
     }
     else {
-      const newState = _.extend({}, state, op.diff);
+      const newState = _.extend({}, state, op.context);
       const diff = _.pickBy(newState, (value, key) => value !== state[key]);
       state = newState;
       if (_.size(diff) > 0) {
         push(null, {
           timestamp: op.timestamp,
-          diff: diff
+          context: diff
         });
       }
       next();
@@ -101,7 +101,7 @@ function diffOperationStream(os) {
 function mergeCloseOperations(os, threshold = 1) {
   let operation = {
     timestamp: null,
-    diff: {}
+    context: {}
   };
   return os.consume((err, newOperation, push, next) => {
     if (err) {
@@ -119,7 +119,7 @@ function mergeCloseOperations(os, threshold = 1) {
       next();
     }
     else if (newOperation.timestamp - operation.timestamp < threshold) {
-      operation.diff = _.extend(operation.diff, newOperation.diff);
+      operation.context = _.extend(operation.context, newOperation.context);
       next();
     }
     else {
@@ -157,30 +157,30 @@ new Promise((resolve, reject) => {
   .map(({ time, device, value }) => {
     let operation = {
       timestamp: time.timestamp,
-      diff: {
+      context: {
         tz: time.timezone
       }
     };
-    operation.diff[device] = value;
+    operation.context[device] = value;
     return operation;
   })
   .scan1((previousOp, op) => ({
     timestamp: op.timestamp,
-    diff: _.extend({}, previousOp.diff, op.diff)
+    context: _.extend({}, previousOp.context, op.context)
   }))
-  .map(({ timestamp, diff }) => {
-    const movementValues = _.filter(diff, (value, device) => _.includes(devices.MOTION_SENSORS, device));
+  .map(({ timestamp, context }) => {
+    const movementValues = _.filter(context, (value, device) => _.includes(devices.MOTION_SENSORS, device));
     const counts = _.countBy(movementValues);
     return {
       timestamp: timestamp,
-      diff: {
-        tz: diff.tz,
-        light: diff[devices.LIGHT] && (_.includes(['OFF', 'Unknown'], diff[devices.LIGHT]) ? 'OFF' : 'ON'),
+      context: {
+        tz: context.tz,
+        light: context[devices.LIGHT] && (_.includes(['OFF', 'Unknown'], context[devices.LIGHT]) ? 'OFF' : 'ON'),
         movement: counts['ON'] || 0
       }
     };
   })
-  .filter(({ diff }) => diff.tz && diff.light && diff.movement); // Filter the incomplete operations
+  .filter(({ context }) => context.tz && context.light && context.movement); // Filter the incomplete operations
 
   const mergedOperationsStream = mergeCloseOperations(fullOperationsStream, 10);
 
