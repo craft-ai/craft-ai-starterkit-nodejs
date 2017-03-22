@@ -72,7 +72,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T01:30:00+09:00')
       );
-      console.log(`Decision taken:\n- The light is ${d.decision.light} when there is no movement at 1:30AM.`);
+      console.log(`Decision taken:\n- The light is ${d.output.light.predicted_value} when there is no movement at 1:30AM.`);
     }
     {
       const d = craftai.decide(
@@ -82,7 +82,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T08:58:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is no movement at 8:58AM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 8:58AM.`);
     }
     {
       const d = craftai.decide(
@@ -92,7 +92,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T09:42:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is no movement at 9:42AM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 9:42AM.`);
     }
     {
       const d = craftai.decide(
@@ -102,7 +102,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T09:42:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is some movement at 9:42AM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 9:42AM.`);
     }
     {
       const d = craftai.decide(
@@ -112,7 +112,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T17:03:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is some movement at 5:03PM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 5:03PM.`);
     }
     {
       const d = craftai.decide(
@@ -122,7 +122,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T20:55:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is some movement at 8:55PM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 8:55PM.`);
     }
     {
       const d = craftai.decide(
@@ -132,7 +132,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T22:07:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is some movement at 10:07PM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 10:07PM.`);
     }
     {
       const d = craftai.decide(
@@ -142,7 +142,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T09:42:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is a lot of movement at 9:42AM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 9:42AM.`);
     }
     {
       const d = craftai.decide(
@@ -152,7 +152,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
         },
         new craftai.Time('2010-01-04T02:17:00+09:00')
       );
-      console.log(`- The light is ${d.decision.light} when there is a lot of movement at 2:17AM.`);
+      console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
     }
   });
 })
