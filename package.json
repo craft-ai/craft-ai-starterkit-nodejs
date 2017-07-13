@@ -32,9 +32,8 @@
     "unzip": "0.1.11"
   },
   "devDependencies": {
-    "eslint": "3.18.0",
-    "eslint-config-craft-ai": "2.1.2",
-    "eslint-plugin-react": "6.10.3"
+    "eslint": "^3.0.0",
+    "eslint-config-craft-ai": "^2.0.0"
   },
   "engines": {
     "node": "6.9.1"
