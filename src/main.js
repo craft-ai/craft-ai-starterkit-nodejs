@@ -12,11 +12,7 @@ const ROOM = 'BEDROOM_1';
 const LOCAL_FILE_PATH = path.join(__dirname, `../data/twor_${ROOM}.json`);
 
 // 0 - Create the craft client
-const CRAFT_CLIENT = craftai({
-  owner: process.env.CRAFT_OWNER,
-  project: process.env.CRAFT_PROJECT,
-  token: process.env.CRAFT_TOKEN
-});
+const CRAFT_CLIENT = craftai(process.env.CRAFT_TOKEN);
 
 // 1 - Retrieve the prepared data
 new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
