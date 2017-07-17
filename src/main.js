@@ -150,7 +150,6 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       );
       console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
     }
-    process.exit(0);
   });
 })
 .catch(error => {
