@@ -61,7 +61,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     console.log('Decision tree computed!');
     // 6 - Get decisions
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 0
@@ -71,7 +71,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`Decision taken:\n- The light is ${d.output.light.predicted_value} when there is no movement at 1:30AM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 0
@@ -81,7 +81,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 8:58AM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 0
@@ -91,7 +91,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 9:42AM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 2
@@ -101,7 +101,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 9:42AM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 2
@@ -111,7 +111,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 5:03PM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 2
@@ -121,7 +121,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 8:55PM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 2
@@ -131,7 +131,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 10:07PM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 10
@@ -141,7 +141,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
       console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 9:42AM.`);
     }
     {
-      const d = craftai.decide(
+      const d = craftai.interpreter.decide(
         tree,
         {
           movement: 10
