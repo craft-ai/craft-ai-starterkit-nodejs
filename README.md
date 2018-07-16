@@ -14,7 +14,7 @@ The end goal: automate the _light_ in a room based on _motion sensors_ and _time
 - Install [Node.js](https://nodejs.org/en/download/) on your computer (version 6.9 is recommended),
 - Install dependencies by running `npm install` in a terminal from the directory where the sources are.
 - in this directory, create a `.env` file setting the following variable:
-    - `CRAFT_TOKEN` allows you to [authenticate your calls to the **craft ai** API](https://beta.craft.ai/doc/python#1---retrieve-your-credentials):
+    - `CRAFT_TOKEN` allows you to [authenticate your calls to the **craft ai** API](https://beta.craft.ai/doc/js#1---retrieve-your-credentials):
     ```
     CRAFT_TOKEN=my-token
     ```
