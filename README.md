@@ -13,7 +13,7 @@ The end goal: automate the _light_ in a room based on _motion sensors_ and _time
 - Download or clone the [sources from GitHub](https://github.com/craft-ai/craft-ai-starterkit-nodejs),
 - Install [Node.js](https://nodejs.org/en/download/) on your computer (version 6.9 is recommended),
 - Install dependencies by running `npm install` in a terminal from the directory where the sources are.
-- Create a new project using this [link](https://beta.craft.ai/inspector). You can see that you have now two tokens : the "Read API token" and the "Write API token". Only the latter will be used here. These tokens allow you to authenticate your calls to the **craft ai** API as explained in the subsection 1 of this [tutorial](https://beta.craft.ai/doc/js).
+- Create a new project using this [link](https://beta.craft.ai/inspector). You can see that you now have two tokens : the "Read API token" and the "Write API token". Only the latter will be used here. These tokens allow you to authenticate your calls to the **craft ai** API as explained in the [documentation](https://beta.craft.ai/doc/js).
 - In the cloned/downloaded repository, create a `.env` file. Fill it with the line `CRAFT_TOKEN=` followed by the Write API token of your project. It should look like this:
     ```
     CRAFT_TOKEN=paste-your-write-token-here
