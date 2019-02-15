@@ -5,9 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const process = require('process');
 
-const ROOM = 'BEDROOM_1';
+// const ROOM = 'BEDROOM_1';
 // const ROOM = 'LIVING_ROOM';
 // const ROOM = 'RESTROOM';
+const ROOM = 'BEDROOM_1augment'
 
 const LOCAL_FILE_PATH = path.join(__dirname, `../data/twor_${ROOM}.json`);
 
@@ -22,135 +23,109 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
 .then(data => JSON.parse(data))
 .then(context => {
   const agentName = ROOM;
+  let tab = [];
+  for (let i = 0; i < 20; i++) {
+    console.log(`Deleting agent ${agentName + i}...`);
+    tab[i] = CRAFT_CLIENT.deleteAgent(agentName + i)
+  }
+  return Promise.all(
+    tab
+  )
   // 2 - Cleanup the mess (agent's name can't be duplicate)
-  return CRAFT_CLIENT.deleteAgent(agentName)
   // 3 - Create the agent
   .then(() => {
-    console.log(`Creating agent ${agentName}.`);
-    return CRAFT_CLIENT.createAgent({
-      context: {
-        movement: {
-          type: 'continuous'
+    let tab = [];
+    for (let i = 0; i < 20; i++) {
+      console.log(`Creating agent ${agentName + i}.`);
+      tab[i] = CRAFT_CLIENT.createAgent({
+        context: {
+          movement: {
+            type: 'continuous'
+          },
+          feature0: {
+            type: 'continuous'
+          },
+          feature1: {
+            type: 'continuous'
+          },
+          feature2: {
+            type: 'continuous'
+          },
+          feature3: {
+            type: 'continuous'
+          },
+          feature4: {
+            type: 'continuous'
+          },
+          feature5: {
+            type: 'continuous'
+          },
+          feature6: {
+            type: 'continuous'
+          },
+          feature7: {
+            type: 'continuous'
+          },
+          feature8: {
+            type: 'continuous'
+          },
+          feature9: {
+            type: 'continuous'
+          },
+          light: {
+            type: 'enum'
+          },
+          tz: {
+            type: 'timezone'
+          },
+          time: {
+            type: 'time_of_day'
+          }
         },
-        light: {
-          type: 'enum'
-        },
-        tz: {
-          type: 'timezone'
-        },
-        time: {
-          type: 'time_of_day'
-        }
-      },
-      output: ['light'],
-      time_quantum: 15 * 60 // 15 min
-    }, agentName);
+        output: ['light'],
+        time_quantum: 60 * 60, // 15 min
+        //learning_period: 1400000
+      }, agentName + i);
+    }
+    return Promise.all(
+      tab
+    );
   })
   // 4 - Send the dataset's operations
   .then(() => {
-    console.log(`Adding context operations for agent ${agentName}...`);
-    return CRAFT_CLIENT.addAgentContextOperations(agentName, context);
+    let tab = [];
+    for (let i = 0; i < 20; i++) {
+      console.log(`Adding context operations for agent ${agentName + i}...`);
+      tab[i] = CRAFT_CLIENT.addAgentContextOperations(agentName + i, context);
+    }
+    return Promise.all(
+      tab
+    );
   })
   .then(() => {
-    console.log(`Computing the decision model for agent ${agentName} (this may take a little while)...`);
     // 5 - Compute decision from the decision tree in order to automate the light
     // Download the tree
-    return CRAFT_CLIENT.getAgentDecisionTree(agentName, context[context.length - 1].timestamp);
+    let tab = [];
+    for (let i = 0; i < 20; i++) {
+      console.log(`Computing the decision model for agent ${agentName + i} (this may take a little while)...`);
+      tab[i] = CRAFT_CLIENT.getAgentDecisionTree(agentName + i, context[context.length - 1].timestamp);
+    }
+    return Promise.all(
+      tab
+    )
+    // .catch(error => {
+    //   console.log('Error!', error)
+    //   process.exit(1)
+    // })
   })
-  .then(tree => {
-    console.log('Decision tree computed!');
-    // 6 - Get decisions
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 0
-        },
-        new craftai.Time('2010-01-04T01:30:00+09:00')
-      );
-      console.log(`Decision taken:\n- The light is ${d.output.light.predicted_value} when there is no movement at 1:30AM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 0
-        },
-        new craftai.Time('2010-01-04T08:58:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 8:58AM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 0
-        },
-        new craftai.Time('2010-01-04T09:42:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 9:42AM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 2
-        },
-        new craftai.Time('2010-01-04T09:42:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 9:42AM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 2
-        },
-        new craftai.Time('2010-01-04T17:03:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 5:03PM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 2
-        },
-        new craftai.Time('2010-01-04T20:55:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 8:55PM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 2
-        },
-        new craftai.Time('2010-01-04T22:07:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 10:07PM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 10
-        },
-        new craftai.Time('2010-01-04T09:42:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 9:42AM.`);
-    }
-    {
-      const d = craftai.interpreter.decide(
-        tree,
-        {
-          movement: 10
-        },
-        new craftai.Time('2010-01-04T02:17:00+09:00')
-      );
-      console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
-    }
-  });
+  .catch(error => {
+    console.log('Error!', error)
+    process.exit(1)
+  })
+  .then(() => {
+    console.log("Finished");
+    process.exit(0)
+  })
 })
 .catch(error => {
   console.log('Error!', error);
