@@ -16,11 +16,13 @@ const CRAFT_CLIENT = craftai(process.env.CRAFT_TOKEN);
 
 // 1 - Retrieve the prepared data
 new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
-  if (err) reject(err);
+  if (err) {
+    reject(err);
+  }
   resolve(data);
 }))
-.then(data => JSON.parse(data))
-.then(context => {
+.then((data) => JSON.parse(data))
+.then((context) => {
   const agentName = ROOM;
   // 2 - Cleanup the mess (agent's name can't be duplicate)
   return CRAFT_CLIENT.deleteAgent(agentName)
@@ -55,9 +57,9 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     console.log(`Computing the decision model for agent ${agentName} (this may take a little while)...`);
     // 5 - Compute decision from the decision tree in order to automate the light
     // Download the tree
-    return CRAFT_CLIENT.getAgentDecisionTree(agentName, context[context.length - 1].timestamp);
+    return CRAFT_CLIENT.getAgentDecisionTree(agentName, context[context.length - 1].timestamp, 2);
   })
-  .then(tree => {
+  .then((tree) => {
     console.log('Decision tree computed!');
     // 6 - Get decisions
     {
@@ -152,7 +154,7 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     }
   });
 })
-.catch(error => {
+.catch((error) => {
   console.log('Error!', error);
   process.exit(1);
 });
