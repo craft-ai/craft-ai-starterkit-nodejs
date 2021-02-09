@@ -27,6 +27,7 @@
     "highland": "2.10.4",
     "lodash": "4.17.4",
     "moment-timezone": "0.5.11",
+    "request": "^2.88.2",
     "rimraf": "2.6.1",
     "stream-reduce": "1.0.3",
     "unzip": "0.1.11",
