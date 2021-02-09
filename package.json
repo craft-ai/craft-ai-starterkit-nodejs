@@ -37,6 +37,6 @@
     "eslint-config-craft-ai": "^2.0.0"
   },
   "engines": {
-    "node": "6.9.1"
+    "node": "12.20.1"
   }
 }
