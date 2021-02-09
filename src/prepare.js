@@ -8,7 +8,7 @@ const path = require('path');
 const process = require('process');
 const rimraf = require('rimraf');
 const Time = require('craft-ai').createClient.Time;
-const unzip = require('unzip');
+const unzipper = require('unzipper');
 
 dotenv.load();
 
@@ -60,17 +60,17 @@ const ROOMS = {
 
 function createDatasetReadStream(path) {
   return highland(fs.createReadStream(path))
-  .split() //split stream to break on newlines
-  .map(line => _.zipObject(['date', 'time', 'sensor', 'value'], line.split(/[\s]+/)))
-  .reject(({ date, time, sensor, value })  => !_.isString(date) || !_.isString(time) || !_.isString(sensor) || !_.isString(value))
-  .map(({ date, time, sensor, value }) => {
-    const numberValue = _.toNumber(value);
-    return {
-      time: Time(moment.tz(`${date}T${time}`, 'Asia/Tokyo')),
-      device: sensor,
-      value: _.isNaN(numberValue) ? value : numberValue
-    };
-  });
+    .split() //split stream to break on newlines
+    .map(line => _.zipObject(['date', 'time', 'sensor', 'value'], line.split(/[\s]+/)))
+    .reject(({ date, time, sensor, value }) => !_.isString(date) || !_.isString(time) || !_.isString(sensor) || !_.isString(value))
+    .map(({ date, time, sensor, value }) => {
+      const numberValue = _.toNumber(value);
+      return {
+        time: Time(moment.tz(`${date}T${time}`, 'Asia/Tokyo')),
+        device: sensor,
+        value: _.isNaN(numberValue) ? value : numberValue
+      };
+    });
 }
 
 function diffOperationStream(os) {
@@ -135,81 +135,81 @@ new Promise((resolve, reject) => {
   http.get('http://ailab.wsu.edu/casas/datasets/twor.2010.zip', response => {
     console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
     response
-    .pipe(unzip.Extract({
-      path: DOWNLOAD_DIR
-    }))
-    .on('close', () => {
-      resolve();
-    })
-    .on('error', err => {
-      reject(err);
-    });
+      .pipe(unzipper.Extract({
+        path: DOWNLOAD_DIR
+      }))
+      .on('close', () => {
+        resolve();
+      })
+      .on('error', err => {
+        reject(err);
+      });
   });
 })
-// 3 - Parse the data to retrieve the sensors and their values
-.then(() => createDatasetReadStream(path.join(DOWNLOAD_DIR, './twor.2010/data')))
-.then(stream => Promise.all(_.map(ROOMS, (devices, room) => {
-  const outputFile = path.join(DATA_DIR, `./twor_${room}.json`);
-  const selectedDevices = _.concat(devices.MOTION_SENSORS, [devices.LIGHT]);
-  const fullOperationsStream = stream
-  .fork()
-  .filter(({ device }) => _.includes(selectedDevices, device))
-  .map(({ time, device, value }) => {
-    let operation = {
-      timestamp: time.timestamp,
-      context: {
-        tz: time.timezone
-      }
-    };
-    operation.context[device] = value;
-    return operation;
+  // 3 - Parse the data to retrieve the sensors and their values
+  .then(() => createDatasetReadStream(path.join(DOWNLOAD_DIR, './twor.2010/data')))
+  .then(stream => Promise.all(_.map(ROOMS, (devices, room) => {
+    const outputFile = path.join(DATA_DIR, `./twor_${room}.json`);
+    const selectedDevices = _.concat(devices.MOTION_SENSORS, [devices.LIGHT]);
+    const fullOperationsStream = stream
+      .fork()
+      .filter(({ device }) => _.includes(selectedDevices, device))
+      .map(({ time, device, value }) => {
+        let operation = {
+          timestamp: time.timestamp,
+          context: {
+            tz: time.timezone
+          }
+        };
+        operation.context[device] = value;
+        return operation;
+      })
+      .scan1((previousOp, op) => ({
+        timestamp: op.timestamp,
+        context: _.extend({}, previousOp.context, op.context)
+      }))
+      .map(({ timestamp, context }) => {
+        const movementValues = _.filter(context, (value, device) => _.includes(devices.MOTION_SENSORS, device));
+        const counts = _.countBy(movementValues);
+        return {
+          timestamp: timestamp,
+          context: {
+            tz: context.tz,
+            light: context[devices.LIGHT] && (_.includes(['OFF', 'Unknown'], context[devices.LIGHT]) ? 'OFF' : 'ON'),
+            movement: counts['ON'] || 0
+          }
+        };
+      })
+      .filter(({ context }) => context.tz && context.light && context.movement); // Filter the incomplete operations
+
+    const mergedOperationsStream = mergeCloseOperations(fullOperationsStream, 10);
+
+    const diffedsOperationStream = diffOperationStream(mergedOperationsStream);
+
+    const dataStream = highland([
+      highland(['[\n  ']),
+      diffedsOperationStream.map(operation => JSON.stringify(operation)).intersperse(',\n  '),
+      highland(['\n]\n'])
+    ])
+      .sequence();
+
+    return new Promise((resolve, reject) => {
+      rimraf(outputFile, err => err ? reject(err) : resolve());
+    })
+      .then(() => new Promise((resolve, reject) => {
+        console.log(`Building the operation history for room ${room} from 'twor.2010'...`);
+
+        const outputStream = fs.createWriteStream(outputFile);
+        outputStream.on('close', () => resolve());
+        outputStream.on('error', err => reject(err));
+
+        dataStream.pipe(outputStream);
+      }));
+  })))
+  .then(() => {
+    console.log('Preparation of dataset \'twor.2010\' successful!');
   })
-  .scan1((previousOp, op) => ({
-    timestamp: op.timestamp,
-    context: _.extend({}, previousOp.context, op.context)
-  }))
-  .map(({ timestamp, context }) => {
-    const movementValues = _.filter(context, (value, device) => _.includes(devices.MOTION_SENSORS, device));
-    const counts = _.countBy(movementValues);
-    return {
-      timestamp: timestamp,
-      context: {
-        tz: context.tz,
-        light: context[devices.LIGHT] && (_.includes(['OFF', 'Unknown'], context[devices.LIGHT]) ? 'OFF' : 'ON'),
-        movement: counts['ON'] || 0
-      }
-    };
-  })
-  .filter(({ context }) => context.tz && context.light && context.movement); // Filter the incomplete operations
-
-  const mergedOperationsStream = mergeCloseOperations(fullOperationsStream, 10);
-
-  const diffedsOperationStream = diffOperationStream(mergedOperationsStream);
-
-  const dataStream = highland([
-    highland(['[\n  ']),
-    diffedsOperationStream.map(operation => JSON.stringify(operation)).intersperse(',\n  '),
-    highland(['\n]\n'])
-  ])
-  .sequence();
-
-  return new Promise((resolve, reject) => {
-    rimraf(outputFile, err => err ? reject(err) : resolve());
-  })
-  .then(() => new Promise((resolve, reject) => {
-    console.log(`Building the operation history for room ${room} from 'twor.2010'...`);
-
-    const outputStream = fs.createWriteStream(outputFile);
-    outputStream.on('close', () => resolve());
-    outputStream.on('error', err => reject(err));
-
-    dataStream.pipe(outputStream);
-  }));
-})))
-.then(() => {
-  console.log('Preparation of dataset \'twor.2010\' successful!');
-})
-.catch(err => {
-  console.log('Error', err);
-  process.exit(1);
-});
+  .catch(err => {
+    console.log('Error', err);
+    process.exit(1);
+  });
