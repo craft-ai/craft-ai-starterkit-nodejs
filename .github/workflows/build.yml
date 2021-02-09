@@ -17,11 +17,13 @@ jobs:
         with:
           node-version: "10.x"
           registry-url: 'https://registry.npmjs.com'
-      - name: Install packages
+      - name: Prune
         run: npm prune
       - name: Install packages
         run: npm install
-      - name: Install packages
+      - name: Start
+        env:
+         CRAFT_TOKEN: ${{ secrets.STANLEY_CRAFT_AI_TOKEN }} 
         run: npm start
       - name: Send message to Slack API
         uses: archive/github-actions-slack@v1.0.3
