@@ -133,8 +133,8 @@ function mergeCloseOperations(os, threshold = 1) {
 
 // 1 - Download the dataset
 new Promise((resolve, reject) => {
+  console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
   let stream = request({
-    /* Here you should specify the exact link to the file you are trying to download */
     uri: 'http://ailab.wsu.edu/casas/datasets/twor.2010.zip',
     headers: {
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -142,9 +142,9 @@ new Promise((resolve, reject) => {
       'Cache-Control': 'max-age=0',
       'Connection': 'keep-alive',
     },
-    /* GZIP true for most of the websites now, disable it if you don't need it */
     gzip: true
   })
+    // 2 - Extract the dataset
     .pipe(unzipper.Extract({
       path: DOWNLOAD_DIR
     }))

@@ -30,7 +30,6 @@
     "request": "^2.88.2",
     "rimraf": "2.6.1",
     "stream-reduce": "1.0.3",
-    "unzip": "0.1.11",
     "unzipper": "^0.10.11"
   },
   "devDependencies": {
