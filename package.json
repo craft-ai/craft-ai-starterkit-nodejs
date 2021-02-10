@@ -27,9 +27,9 @@
     "highland": "2.10.4",
     "lodash": "4.17.4",
     "moment-timezone": "0.5.11",
+    "request": "^2.88.2",
     "rimraf": "2.6.1",
     "stream-reduce": "1.0.3",
-    "unzip": "0.1.11",
     "unzipper": "^0.10.11"
   },
   "devDependencies": {
@@ -37,6 +37,6 @@
     "eslint-config-craft-ai": "^2.0.0"
   },
   "engines": {
-    "node": "6.9.1"
+    "node": "12.20.1"
   }
 }

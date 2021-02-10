@@ -9,6 +9,7 @@ const process = require('process');
 const rimraf = require('rimraf');
 const Time = require('craft-ai').createClient.Time;
 const unzipper = require('unzipper');
+const request = require('request');
 
 dotenv.load();
 
@@ -132,19 +133,28 @@ function mergeCloseOperations(os, threshold = 1) {
 
 // 1 - Download the dataset
 new Promise((resolve, reject) => {
-  http.get('http://ailab.wsu.edu/casas/datasets/twor.2010.zip', response => {
-    console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
-    response
-      .pipe(unzipper.Extract({
-        path: DOWNLOAD_DIR
-      }))
-      .on('close', () => {
-        resolve();
-      })
-      .on('error', err => {
-        reject(err);
-      });
-  });
+  console.log('Retrieving dataset \'twor.2010\' from \'http://ailab.wsu.edu/casas/datasets/twor.2010.zip\'...');
+  let stream = request({
+    uri: 'http://ailab.wsu.edu/casas/datasets/twor.2010.zip',
+    headers: {
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Cache-Control': 'max-age=0',
+      'Connection': 'keep-alive',
+    },
+    gzip: true
+  })
+    // 2 - Extract the dataset
+    .pipe(unzipper.Extract({
+      path: DOWNLOAD_DIR
+    }))
+    .on('finish', () => {
+      console.log(`The file is finished downloading.`);
+      resolve();
+    })
+    .on('error', (error) => {
+      reject(error);
+    })
 })
   // 3 - Parse the data to retrieve the sensors and their values
   .then(() => createDatasetReadStream(path.join(DOWNLOAD_DIR, './twor.2010/data')))
