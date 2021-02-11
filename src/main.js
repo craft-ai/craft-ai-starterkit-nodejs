@@ -9,6 +9,9 @@ const ROOM = 'BEDROOM_1';
 // const ROOM = 'LIVING_ROOM';
 // const ROOM = 'RESTROOM';
 
+const GENERATOR_FILTER = [ROOM];
+const GENERATOR_NAME = 'smarthome';
+
 const LOCAL_FILE_PATH = path.join(__dirname, `../data/twor_${ROOM}.json`);
 
 // 0 - Create the craft client
@@ -54,13 +57,42 @@ new Promise((resolve, reject) => fs.readFile(LOCAL_FILE_PATH, (err, data) => {
     return CRAFT_CLIENT.addAgentContextOperations(agentName, context);
   })
   .then(() => {
-    console.log(`Computing the decision model for agent ${agentName} (this may take a little while)...`);
+    return CRAFT_CLIENT.deleteGenerator(GENERATOR_NAME);
+  })
+  .then(() => {
+    const GENERATOR_CONFIGURATION = {
+      context: {
+          light: {
+              type: "enum"
+          },
+          tz: {
+              type: "timezone"
+          },
+          movement: {
+              type: "continuous"
+          },
+          time: {
+              type: "time_of_day",
+              is_generated: true
+          }
+      },
+      output: [
+          "light"
+      ],
+      learning_period: 1500000,
+      tree_max_operations: 15000,
+      operations_as_events: true,
+      filter: GENERATOR_FILTER
+    };
+    return CRAFT_CLIENT.createGenerator(GENERATOR_CONFIGURATION, GENERATOR_NAME);
+  })
+  .then(() => {
+    console.log(`Computing the decision model for generator ${GENERATOR_NAME} (this may take a little while)...`);
     // 5 - Compute decision from the decision tree in order to automate the light
     // Download the tree
-    return CRAFT_CLIENT.getAgentDecisionTree(agentName, context[context.length - 1].timestamp, 2);
+    return CRAFT_CLIENT.getGeneratorDecisionTree(GENERATOR_NAME, context[context.length - 1].timestamp);
   })
   .then((tree) => {
-    console.log('Decision tree computed!');
     // 6 - Get decisions
     {
       const d = craftai.interpreter.decide(
