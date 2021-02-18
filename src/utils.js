@@ -2,20 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 const readData = async (path) => {
-    return new Promise((resolve, reject) => fs.readFile(path, (err, data) => {
-        if (err) {
-            reject(err);
-        }
-        resolve(data);
-    }))
-        .then((data) => JSON.parse(data))
-        .then((context) => {
-            return context;
-        })
-        .catch((error) => {
-            console.log('Error!', error);
-            process.exit(1);
-        });
+  return new Promise((resolve, reject) => fs.readFile(path, (err, data) => {
+    if (err) {
+      reject(err);
+    }
+    resolve(data);
+  }))
+    .then((data) => JSON.parse(data))
+    .then((context) => {
+      return context;
+     })
+     .catch((error) => {
+       console.log('Error!', error);
+       process.exit(1);
+     });
 }
 
 var prepareData = function (context, room) {
