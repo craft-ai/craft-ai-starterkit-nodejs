@@ -152,20 +152,21 @@ utils.readData(LOCAL_FILE_PATH1)
           { id: ROOM2 },
           { id: ROOM3 }
         ];
-        return CRAFT_CLIENT.deleteAgentBulk(deleteBulkPayload);
+        return Promise.all([
+          CRAFT_CLIENT.deleteAgentBulk(deleteBulkPayload),
+          CRAFT_CLIENT.deleteGenerator(GENERATOR_NAME)
+        ]);
       })
       // 7 - Create Agent 1, 2 and 3
-      .then(() => utils.readData(LOCAL_FILE_PATH1))
-      .then((context_1) => {
-        operations_agent_1 = utils.prepareData(context_1, ROOM1);
-        return utils.readData(LOCAL_FILE_PATH2);
-      })
-      .then((context_2) => {
-        operations_agent_2 = utils.prepareData(context_2, ROOM2);
-        return utils.readData(LOCAL_FILE_PATH3);
-      })
-      .then((context_3) => {
-        operations_agent_3 = utils.prepareData(context_3, ROOM3);
+      .then(() => Promise.all([
+        utils.readData(LOCAL_FILE_PATH1)),
+        utils.readData(LOCAL_FILE_PATH2),
+        utils.readData(LOCAL_FILE_PATH3)
+      ])
+      .then(([context1, context2, context3]) => {
+        const operations_agent_1 = utils.prepareData(context_1, ROOM1);
+        const operations_agent_2 = utils.prepareData(context_2, ROOM2);
+        const operations_agent_3 = utils.prepareData(context_3, ROOM3);
         const configuration = {
           context: {
             movement: {
