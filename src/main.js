@@ -27,9 +27,6 @@ utils.readData(LOCAL_FILE_PATH1)
     const agentName = ROOM1;
     // 2 - Cleanup the mess (agent's name can't be duplicate)
     return CRAFT_CLIENT.deleteAgent(agentName)
-      .then(() => {
-        return CRAFT_CLIENT.deleteGenerator(GENERATOR_NAME);
-      })
       // 3 - Create the agent 1
       .then(() => {
         console.log(`Creating agent ${agentName}.`);
