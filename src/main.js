@@ -1,11 +1,10 @@
 require('dotenv').load();
 
 const craftai = require('craft-ai').createClient;
-const fs = require('fs');
 const path = require('path');
 const process = require('process');
 
-var utils = require('./utils');
+const utils = require('./utils');
 
 const ROOM1 = 'BEDROOM_1';
 const ROOM2 = 'LIVING_ROOM';
@@ -26,7 +25,10 @@ utils.readData(LOCAL_FILE_PATH1)
   .then((context) => {
     const agentName = ROOM1;
     // 2 - Cleanup the mess (agent's name can't be duplicate)
-    return CRAFT_CLIENT.deleteAgent(agentName)
+    return Promise.all([
+      CRAFT_CLIENT.deleteAgent(agentName),
+      CRAFT_CLIENT.deleteGenerator(GENERATOR_NAME)
+    ])
       // 3 - Create the agent 1
       .then(() => {
         console.log(`Creating agent ${agentName}.`);
@@ -158,15 +160,7 @@ utils.readData(LOCAL_FILE_PATH1)
         ]);
       })
       // 7 - Create Agent 1, 2 and 3
-      .then(() => Promise.all([
-        utils.readData(LOCAL_FILE_PATH1)),
-        utils.readData(LOCAL_FILE_PATH2),
-        utils.readData(LOCAL_FILE_PATH3)
-      ])
-      .then(([context1, context2, context3]) => {
-        const operations_agent_1 = utils.prepareData(context_1, ROOM1);
-        const operations_agent_2 = utils.prepareData(context_2, ROOM2);
-        const operations_agent_3 = utils.prepareData(context_3, ROOM3);
+      .then(() => {
         const configuration = {
           context: {
             movement: {
@@ -194,16 +188,24 @@ utils.readData(LOCAL_FILE_PATH1)
           { id: ROOM3, configuration: configuration }
         ];
         console.log(`Creating agents ${ROOM1}, ${ROOM2} and ${ROOM3}.`);
-        return CRAFT_CLIENT.createAgentBulk(createBulkPayload)
+        return CRAFT_CLIENT.createAgentBulk(createBulkPayload);
       })
-      .then(() => {
+      .then(() => Promise.all([
+        utils.readData(LOCAL_FILE_PATH1),
+        utils.readData(LOCAL_FILE_PATH2),
+        utils.readData(LOCAL_FILE_PATH3),
+      ]))
+      .then(([context_1, context_2, context_3]) => {
+        const operations_agent_1 = utils.prepareData(context_1, ROOM1);
+        const operations_agent_2 = utils.prepareData(context_2, ROOM2);
+        const operations_agent_3 = utils.prepareData(context_3, ROOM3);
         const contextOperationBulkPayload = [
           { id: ROOM1, operations: operations_agent_1 },
           { id: ROOM2, operations: operations_agent_2 },
           { id: ROOM3, operations: operations_agent_3 }
         ];
         console.log(`Adding context operations for agents ${ROOM1}, ${ROOM2} and ${ROOM3}.`);
-        return CRAFT_CLIENT.addAgentContextOperationsBulk(contextOperationBulkPayload)
+        return CRAFT_CLIENT.addAgentContextOperationsBulk(contextOperationBulkPayload);
       })
       .then(() => {
         const GENERATOR_CONFIGURATION = {
@@ -223,7 +225,7 @@ utils.readData(LOCAL_FILE_PATH1)
             }
           },
           output: [
-            "stateChange"
+            'stateChange'
           ],
           learning_period: 1500000,
           tree_max_operations: 15000,
@@ -283,7 +285,7 @@ utils.readData(LOCAL_FILE_PATH1)
           );
           console.log(`- A change of state ${d13.output.stateChange.predicted_value} is expected in the bedroom at 2:17AM.`);
         }
-      })
+      });
   })
   .catch((error) => {
     console.log('Error!', error);
