@@ -96,54 +96,54 @@ utils.readData(LOCAL_FILE_PATH1)
         );
         console.log(`- The light is ${d4.output.light.predicted_value} when there is some movement at 9:42AM.`);
         {
-          const d = craftai.interpreter.decide(
+          const d5 = craftai.interpreter.decide(
             tree,
             {
               movement: 2
             },
             new craftai.Time('2010-01-04T17:03:00+09:00')
           );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 5:03PM.`);
+          console.log(`- The light is ${d5.output.light.predicted_value} when there is some movement at 5:03PM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d6 = craftai.interpreter.decide(
             tree,
             {
               movement: 2
             },
             new craftai.Time('2010-01-04T20:55:00+09:00')
           );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 8:55PM.`);
+          console.log(`- The light is ${d6.output.light.predicted_value} when there is some movement at 8:55PM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d7 = craftai.interpreter.decide(
             tree,
             {
               movement: 2
             },
             new craftai.Time('2010-01-04T22:07:00+09:00')
           );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is some movement at 10:07PM.`);
+          console.log(`- The light is ${d7.output.light.predicted_value} when there is some movement at 10:07PM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d8 = craftai.interpreter.decide(
             tree,
             {
               movement: 10
             },
             new craftai.Time('2010-01-04T09:42:00+09:00')
           );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 9:42AM.`);
+          console.log(`- The light is ${d8.output.light.predicted_value} when there is a lot of movement at 9:42AM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d9 = craftai.interpreter.decide(
             tree,
             {
               movement: 10
             },
             new craftai.Time('2010-01-04T02:17:00+09:00')
           );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
+          console.log(`- The light is ${d9.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
         }
       })
       .then(() => {
@@ -243,44 +243,44 @@ utils.readData(LOCAL_FILE_PATH1)
         console.log('Generator decision tree computed!');
         // 10 - Get decisions
         {
-          const d = craftai.interpreter.decide(
+          const d10 = craftai.interpreter.decide(
             tree,
             {
               room: ROOM1
             },
             new craftai.Time('2010-01-04T01:30:00+09:00')
           );
-          console.log(`- A change of state ${d.output.stateChange.predicted_value} is expected in the bedroom at 1:30AM.`);
+          console.log(`- A change of state ${d10.output.stateChange.predicted_value} is expected in the bedroom at 1:30AM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d11 = craftai.interpreter.decide(
             tree,
             {
               room: ROOM2
             },
             new craftai.Time('2010-01-04T08:58:00+09:00')
           );
-          console.log(`- A change of state ${d.output.stateChange.predicted_value} is expected in the living room at 8:58AM.`);
+          console.log(`- A change of state ${d11.output.stateChange.predicted_value} is expected in the living room at 8:58AM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d12 = craftai.interpreter.decide(
             tree,
             {
               room: ROOM3
             },
             new craftai.Time('2010-01-04T09:42:00+09:00')
           );
-          console.log(`- A change of state ${d.output.stateChange.predicted_value} is expected in the restroom at 9:42AM.`);
+          console.log(`- A change of state ${d12.output.stateChange.predicted_value} is expected in the restroom at 9:42AM.`);
         }
         {
-          const d = craftai.interpreter.decide(
+          const d13 = craftai.interpreter.decide(
             tree,
             {
               room: ROOM1
             },
             new craftai.Time('2010-01-08T02:17:00+09:00')
           );
-          console.log(`- A change of state ${d.output.stateChange.predicted_value} is expected in the bedroom at 2:17AM.`);
+          console.log(`- A change of state ${d13.output.stateChange.predicted_value} is expected in the bedroom at 2:17AM.`);
         }
       })
   })
