@@ -18,21 +18,22 @@ const readData = async (path) => {
      });
 }
 
-var prepareData = function (context, room) {
-    operations_agent = [];
-    context.forEach((originalData) => {
-        data = {
-            timestamp: originalData.timestamp,
-            context: {
-                stateChange: originalData.context.light == "ON" ? (originalData.context.movement > 1 ? 'both' : 'light') : (originalData.context.movement > 1 ? 'movement' : 'none'),
-                room: room,
-                tz: originalData.context.tz,
-                movement: originalData.context.movement,
-            }
-        }
-        operations_agent.push(data);
-    });
-    return operations_agent;
+const prepareData = (context, room) => {
+  let operationsAgent = [];
+  context.forEach((originalData) => {
+    data = {
+      timestamp: originalData.timestamp,
+      context: {
+        stateChange: originalData.context.light == "ON" ? (originalData.context.movement > 1 ? 'both' : 'light') : (originalData.context.movement > 1 ? 'movement' : 'none'),
+        room: room,
+        tz: originalData.context.tz,
+        movement: originalData.context.movement
+      }
+    }
+    operationsAgent.push(data);
+  });
+  return operationsAgent;
 }
+
 exports.readData = readData;
 exports.prepareData = prepareData;
