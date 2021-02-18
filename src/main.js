@@ -63,16 +63,14 @@ utils.readData(LOCAL_FILE_PATH1)
       .then((tree) => {
         console.log('Decision tree computed!');
         // 6 - Get decisions
-        {
-          const d = craftai.interpreter.decide(
-            tree,
-            {
-              movement: 0
-            },
-            new craftai.Time('2010-01-04T01:30:00+09:00')
-          );
-          console.log(`Decision taken:\n- The light is ${d.output.light.predicted_value} when there is no movement at 1:30AM.`);
-        }
+        const d1 = craftai.interpreter.decide(
+          tree,
+          {
+            movement: 0
+          },
+          new craftai.Time('2010-01-04T01:30:00+09:00')
+        );
+        console.log(`Decision taken:\n- The light is ${d1.output.light.predicted_value} when there is no movement at 1:30AM.`);
         {
           const d = craftai.interpreter.decide(
             tree,
