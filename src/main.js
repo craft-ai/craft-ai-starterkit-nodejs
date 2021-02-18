@@ -152,7 +152,10 @@ utils.readData(LOCAL_FILE_PATH1)
           { id: ROOM2 },
           { id: ROOM3 }
         ];
-        return CRAFT_CLIENT.deleteAgentBulk(deleteBulkPayload);
+        return Promise.all([
+          CRAFT_CLIENT.deleteAgentBulk(deleteBulkPayload),
+          CRAFT_CLIENT.deleteGenerator(GENERATOR_NAME)
+        ]);
       })
       // 7 - Create Agent 1, 2 and 3
       .then(() => utils.readData(LOCAL_FILE_PATH1))
