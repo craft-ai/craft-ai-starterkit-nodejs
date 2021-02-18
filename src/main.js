@@ -79,16 +79,14 @@ utils.readData(LOCAL_FILE_PATH1)
           new craftai.Time('2010-01-04T08:58:00+09:00')
         );
         console.log(`- The light is ${d2.output.light.predicted_value} when there is no movement at 8:58AM.`);
-        {
-          const d = craftai.interpreter.decide(
-            tree,
-            {
-              movement: 0
-            },
-            new craftai.Time('2010-01-04T09:42:00+09:00')
-          );
-          console.log(`- The light is ${d.output.light.predicted_value} when there is no movement at 9:42AM.`);
-        }
+        const d3 = craftai.interpreter.decide(
+          tree,
+          {
+            movement: 0
+          },
+          new craftai.Time('2010-01-04T09:42:00+09:00')
+        );
+        console.log(`- The light is ${d3.output.light.predicted_value} when there is no movement at 9:42AM.`);
         {
           const d = craftai.interpreter.decide(
             tree,
