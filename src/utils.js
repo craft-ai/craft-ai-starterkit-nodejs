@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-var readData = async function (path) {
+const readData = async (path) => {
     return new Promise((resolve, reject) => fs.readFile(path, (err, data) => {
         if (err) {
             reject(err);
