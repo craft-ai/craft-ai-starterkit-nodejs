@@ -145,7 +145,6 @@ utils.readData(LOCAL_FILE_PATH1)
             new craftai.Time('2010-01-04T02:17:00+09:00')
           );
           console.log(`- The light is ${d9.output.light.predicted_value} when there is a lot of movement at 2:17AM.`);
-        }
       })
       .then(() => {
         const deleteBulkPayload = [
