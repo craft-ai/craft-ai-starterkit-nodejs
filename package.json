@@ -17,7 +17,6 @@
     "build-craft-ai": "cd node_modules/craft-ai && npm install && npm run build",
     "start": "node src/main.js",
     "prepare_data": "node src/prepare.js",
-    "generator": "node src/generator.js",
     "lint": "eslint .",
     "fix_lint": "eslint --fix ."
   },
