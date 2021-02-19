@@ -21,7 +21,7 @@
     "fix_lint": "eslint --fix ."
   },
   "dependencies": {
-    "craft-ai": "1.16.0",
+    "craft-ai": "1.20.0",
     "dotenv": "4.0.0",
     "event-stream": "3.3.4",
     "highland": "2.10.4",
