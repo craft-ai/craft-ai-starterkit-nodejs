@@ -125,8 +125,6 @@ utils.readData(LOCAL_FILE_PATH1)
             new craftai.Time('2010-01-04T22:07:00+09:00')
           );
           console.log(`- The light is ${d7.output.light.predicted_value} when there is some movement at 10:07PM.`);
-        }
-        {
           const d8 = craftai.interpreter.decide(
             tree,
             {
