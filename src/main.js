@@ -253,8 +253,6 @@ utils.readData(LOCAL_FILE_PATH1)
             new craftai.Time('2010-01-04T01:30:00+09:00')
           );
           console.log(`- A change of state ${d10.output.stateChange.predicted_value} is expected in the bedroom at 1:30AM.`);
-        }
-        {
           const d11 = craftai.interpreter.decide(
             tree,
             {
