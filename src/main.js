@@ -244,7 +244,6 @@ utils.readData(LOCAL_FILE_PATH1)
       .then((tree) => {
         console.log('Generator decision tree computed!');
         // 10 - Get decisions
-        {
           const d10 = craftai.interpreter.decide(
             tree,
             {
